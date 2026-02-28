@@ -157,6 +157,8 @@ body {
 .conn-details {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    overflow: hidden;
 }
 
 .conn-name {
@@ -168,6 +170,29 @@ body {
 .conn-sub {
     font-size: 12px;
     color: var(--text-secondary);
+}
+
+.conn-delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.2s, background-color 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.connection-item:hover .conn-delete-btn {
+    opacity: 1;
+}
+
+.conn-delete-btn:hover {
+    color: #ef5350;
+    background-color: rgba(239, 83, 80, 0.1);
 }
 
 .sidebar-footer {
