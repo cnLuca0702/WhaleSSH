@@ -28,9 +28,9 @@
     "mac": {
       "category": "public.app-category.developer-tools",
       "icon": "icon.png",
+      "identity": null,
       "target": [
-        "dmg",
-        "mas"
+        "dmg"
       ]
     },
     "mas": {
