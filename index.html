@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>WhaleSSH</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="node_modules/@xterm/xterm/css/xterm.css" />
+</head>
+
+<body>
+    <!-- Drag area for frameless window in Mac -->
+    <div class="titlebar-drag-area"></div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="search-box">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" placeholder="搜索主机..." id="search-input">
+                </div>
+                <div class="sidebar-title-row">
+                    <span class="sidebar-title">保存的连接</span>
+                    <button class="icon-btn" id="add-conn-btn" title="Add Connection">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="connection-list" id="connection-list">
+                <!-- Connections will be injected here via JS -->
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="footer-info">
+                    <div class="footer-title">
+                        <img src="icon.svg" width="16" height="16" alt="WhaleSSH Logo" style="border-radius: 4px;">
+                        关于 WhaleSSH
+                    </div>
+                    <div class="footer-version">版本 1.0.0 (Build 2026)</div>
+                    <div class="footer-copyright">版权所有 © 2026 CUC咨询-YOQ.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Area -->
+        <div class="main-area" id="main-area">
+            <!-- Empty State -->
+            <div class="empty-state" id="empty-state">
+                <div class="empty-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                    <span class="underscore">_</span>
+                </div>
+                <h2>选择或创建一个 SSH 连接</h2>
+                <p>双击左侧列表中的主机即可连接</p>
+            </div>
+
+            <!-- Active Sessions Area (Hidden initially) -->
+            <div class="sessions-area" id="sessions-area" style="display: none;">
+                <div class="tabs-header" id="tabs-header">
+                    <!-- Tabs injected here -->
+                </div>
+                <div class="terminals-container" id="terminals-container">
+                    <!-- terminal containers injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Tools -->
+    <div class="floating-tools">
+        <button class="tool-btn" id="snippet-btn" title="Snippets">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Add Connection Modal -->
+    <div class="modal-overlay" id="add-modal" style="display: none;">
+        <div class="modal">
+            <h3>添加新连接</h3>
+            <div class="form-group">
+                <label>名称</label>
+                <input type="text" id="conn-name" placeholder="例如：生产服务器">
+            </div>
+            <div class="form-row">
+                <div class="form-group" style="flex:3;">
+                    <label>主机地址</label>
+                    <input type="text" id="conn-host" placeholder="192.168.1.100">
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>端口</label>
+                    <input type="number" id="conn-port" value="22">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>用户名</label>
+                <input type="text" id="conn-username" placeholder="root">
+            </div>
+            <div class="form-group">
+                <label>认证方式</label>
+                <select id="conn-auth-type">
+                    <option value="password">密码认证</option>
+                    <option value="key">SSH 密钥文件</option>
+                </select>
+            </div>
+            <div class="form-group" id="group-password">
+                <label>密码</label>
+                <input type="password" id="conn-password">
+            </div>
+            <div class="form-group" id="group-key" style="display: none;">
+                <label>私钥文件</label>
+                <div class="file-input-group">
+                    <input type="text" id="conn-key-path" readonly placeholder="未选择文件...">
+                    <button type="button" class="btn-secondary" id="btn-select-key">选择</button>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="btn-cancel-add">取消</button>
+                <button class="btn-primary" id="btn-save-conn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Snippet Modal -->
+    <div class="modal-overlay" id="snippet-modal" style="display: none;">
+        <div class="modal" style="width: 500px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin:0;">快捷命令 (Snippets)</h3>
+                <button class="icon-btn" id="btn-new-snippet" title="新建命令">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="snippet-list" id="snippet-list" style="max-height: 300px; overflow-y: auto;">
+                <!-- Snippets injected here -->
+            </div>
+
+            <div id="snippet-form-area"
+                style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                <div class="form-group">
+                    <label>标题</label>
+                    <input type="text" id="snip-title" placeholder="例如：查看系统日志">
+                </div>
+                <div class="form-group">
+                    <label>命令内容</label>
+                    <textarea id="snip-command" rows="3"
+                        style="width: 100%; background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; padding: 8px 12px; font-size: 13px; outline: none; resize: vertical;"></textarea>
+                </div>
+                <div class="modal-actions" style="margin-top: 12px;">
+                    <button class="btn-cancel" id="btn-cancel-snip">取消</button>
+                    <button class="btn-primary" id="btn-save-snip">保存</button>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" id="btn-close-snippet-modal">关闭窗口</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="node_modules/@xterm/xterm/lib/xterm.js"></script>
+    <script src="node_modules/@xterm/addon-fit/lib/addon-fit.js"></script>
+    <script src="renderer.js"></script>
+</body>
+
+</html>
