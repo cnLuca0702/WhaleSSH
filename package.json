@@ -29,8 +29,13 @@
       "category": "public.app-category.developer-tools",
       "icon": "icon.png",
       "target": [
-        "dmg"
+        "dmg",
+        "mas"
       ]
+    },
+    "mas": {
+      "entitlements": "build/entitlements.mas.plist",
+      "entitlementsInherit": "build/entitlements.mas.inherit.plist"
     },
     "directories": {
       "buildResources": "build"
