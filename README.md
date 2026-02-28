@@ -7,6 +7,8 @@ WhaleSSH is a native-feeling macOS SSH client built using Electron and vanilla H
 
 ## 功能特性 / Features
 
+- **完全免费 (Completely Free)**：开源免费的良心软件，且支持无穷制地保存多个 SSH 连接。 (A truly free software that allows saving multiple concurrent SSH connections without limitations.)
+- **OpenClaw 专属伴侣 (OpenClaw Companion)**：具备强大的自定义快捷命令功能，操作 openclaw 再也不用死记硬背枯燥的命令了！ (Features custom snippet commands, making openclaw administration effortless without memorizing complex syntax.)
 - **原生风格 UI (Native-feel UI)**：采用无边框设计与悬浮 macOS 交通灯按钮，完美契合 Mac 桌面体验。 (Frameless design with macOS traffic lights for a perfect desktop experience.)
 - **多标签页支持 (Multi-Tab Support)**：允许同时建立和管理多个 SSH 连接。 (Establish and manage multiple concurrent SSH connections via tabs.)
 - **配置持久化 (Data Persistence)**：主机 IP、端口、SSH 密钥路径、密码自动保存至本地。 (Hosts, ports, keys, and passwords are saved locally.)
